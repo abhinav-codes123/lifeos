@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
+import Tesseract from "tesseract.js";
 
 import fs from "fs";
 
@@ -34,7 +35,7 @@ console.log(
   });
 
   win.loadURL("http://localhost:5173");
-//   win.webContents.openDevTools();
+  win.webContents.openDevTools();
 }
 
 ipcMain.handle("select-folder", async () => {
@@ -64,6 +65,53 @@ ipcMain.handle("select-folder", async () => {
     folderPath,
     files
   };
+});
+
+ipcMain.handle("select-image", async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ["openFile"],
+
+    filters: [
+      {
+        name: "Images",
+        extensions: [
+          "png",
+          "jpg",
+          "jpeg"
+        ]
+      }
+    ]
+  });
+
+  if (result.canceled)
+    return null;
+
+  return result.filePaths[0];
+});
+
+ipcMain.handle("run-ocr", async (_, imagePath) => {
+  try {
+    console.log("OCR STARTED:", imagePath);
+
+    const {
+      data: { text },
+    } = await Tesseract.recognize(
+      imagePath,
+      "eng"
+    );
+
+    return {
+      success: true,
+      text,
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
 });
 
 // this is for debugging

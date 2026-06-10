@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {  classifyDocument } from "./utils/classifier";
 
 function App() {
   const [files, setFiles] = useState([]);
@@ -23,6 +24,34 @@ function getCategory(extension) {
   return "Other";
 }
 
+const testOCR = async () => {
+  try {
+    const imagePath =
+      await window
+        .electronAPI
+        .selectImage();
+
+    if (!imagePath)
+      return;
+
+    console.log(
+      "Selected:",
+      imagePath
+    );
+
+    const result =
+      await window
+        .electronAPI
+        .runOCR(
+          imagePath
+        );
+    console.log(result);
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
   return (
     <div style={{ padding: "20px" }}>
       <h1>LifeOS</h1>
@@ -32,7 +61,11 @@ function getCategory(extension) {
       </button>
 
       <ul>
+        <button onClick={testOCR}>
+          Test OCR
+        </button>
         {files.map((file, index) => (
+          
           // <li key={index}>{file}</li>
           <li key={index}>
             {file.name}
