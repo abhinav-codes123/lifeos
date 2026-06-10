@@ -1,8 +1,10 @@
 import { useState } from "react";
 import {  classifyDocument } from "./utils/classifier";
+import { scanFiles } from "./utils/scanner";
 
 function App() {
   const [files, setFiles] = useState([]);
+  const [scannedFiles,setScannedFiles] = useState([]);
 
   const handleFolderSelect = async () => {
     const result = await window.electronAPI.selectFolder();
@@ -11,6 +13,17 @@ function App() {
 
     setFiles(result.files);
   };
+
+const scanFolder =
+  async () => {
+
+    const results =await scanFiles(files,window.electronAPI.runOCR,classifyDocument
+      );
+
+    setScannedFiles(
+      results
+    );
+};
 
 function getCategory(extension) {
   const ext = extension.toLowerCase();
@@ -47,6 +60,19 @@ const testOCR = async () => {
         );
     console.log(result);
 
+    const category =
+      classifyDocument(
+        result.text
+      );
+
+      console.log(
+        "CATEGORY:"
+      );
+
+      console.log(
+        category
+      );
+
   } catch (error) {
     console.error(error);
   }
@@ -59,11 +85,31 @@ const testOCR = async () => {
       <button onClick={handleFolderSelect}>
         Select Folder
       </button>
-
-      <ul>
-        <button onClick={testOCR}>
+      <button onClick={scanFolder}>
+        Scan Folder
+      </button>
+      <button onClick={testOCR}>
           Test OCR
         </button>
+
+      {
+        scannedFiles.map(
+          (file, index) => (
+            <div key={index}>
+
+              <h3>
+                {file.name}
+              </h3>
+
+              <p>
+                {file.category}
+              </p>
+
+            </div>
+          )
+        )
+      }
+      <ul>
         {files.map((file, index) => (
           
           // <li key={index}>{file}</li>

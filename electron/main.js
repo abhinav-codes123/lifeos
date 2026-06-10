@@ -1,7 +1,14 @@
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const pdfParse = require("pdf-parse");
+
+console.log(pdfParse);
+
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import Tesseract from "tesseract.js";
+
 
 import fs from "fs";
 
@@ -103,6 +110,26 @@ ipcMain.handle("run-ocr", async (_, imagePath) => {
     return {
       success: true,
       text,
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+});
+
+ipcMain.handle("extract-pdf-text", async (_, pdfPath) => {
+  try {
+    const buffer = fs.readFileSync(pdfPath);
+
+    const data = await pdfParse(buffer);
+
+    return {
+      success: true,
+      text: data.text,
     };
   } catch (error) {
     console.error(error);

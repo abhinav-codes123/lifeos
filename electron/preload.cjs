@@ -19,6 +19,11 @@ contextBridge.exposeInMainWorld(
       ipcRenderer.invoke(
         "run-ocr",
         imagePath
-      )
+      ),
+    extractPDFText: (pdfPath) =>
+      ipcRenderer.invoke(
+        "extract-pdf-text",
+        pdfPath
+      ),
   }
 );
