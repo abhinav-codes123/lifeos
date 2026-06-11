@@ -43,34 +43,29 @@ export function insertDocument(
   document
 ) {
 
-  let docs = [];
+  const docs =
+    getAllDocuments();
 
-  try {
+  const index =
+    docs.findIndex(
+      doc =>
+        doc.filePath ===
+        document.filePath
+    );
 
-    const data =
-      fs.readFileSync(
-        DB_PATH,
-        "utf8"
-      );
+  if (
+    index !== -1
+  ) {
 
-    if (
-      data.trim()
-    ) {
+    docs[index] =
+      document;
 
-      docs =
-        JSON.parse(
-          data
-        );
-    }
+  } else {
 
-  } catch {
-
-    docs = [];
+    docs.push(
+      document
+    );
   }
-
-  docs.push(
-    document
-  );
 
   fs.writeFileSync(
     DB_PATH,
@@ -81,6 +76,48 @@ export function insertDocument(
     )
   );
 }
+// export function insertDocument(
+//   document
+// ) {
+
+//   let docs = [];
+
+//   try {
+
+//     const data =
+//       fs.readFileSync(
+//         DB_PATH,
+//         "utf8"
+//       );
+
+//     if (
+//       data.trim()
+//     ) {
+
+//       docs =
+//         JSON.parse(
+//           data
+//         );
+//     }
+
+//   } catch {
+
+//     docs = [];
+//   }
+
+//   docs.push(
+//     document
+//   );
+
+//   fs.writeFileSync(
+//     DB_PATH,
+//     JSON.stringify(
+//       docs,
+//       null,
+//       2
+//     )
+//   );
+// }
 
 export function getAllDocuments() {
 
