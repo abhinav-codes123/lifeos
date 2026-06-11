@@ -25,5 +25,27 @@ contextBridge.exposeInMainWorld(
         "extract-pdf-text",
         pdfPath
       ),
+      saveDocument: (document) =>
+      ipcRenderer.invoke(
+        "save-document",
+        document
+      ),
+
+    getDocuments: () =>
+      ipcRenderer.invoke(
+        "get-documents"
+      ),
+    searchDocuments:
+    (query) =>
+      ipcRenderer.invoke(
+        "search-documents",
+        query
+      ),
+    openFile:
+    (filePath) =>
+      ipcRenderer.invoke(
+        "open-file",
+        filePath
+      ),
   }
 );

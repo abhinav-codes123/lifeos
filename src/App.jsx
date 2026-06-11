@@ -5,6 +5,8 @@ import { scanFiles } from "./utils/scanner";
 function App() {
   const [files, setFiles] = useState([]);
   const [scannedFiles,setScannedFiles] = useState([]);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
 
   const handleFolderSelect = async () => {
     const result = await window.electronAPI.selectFolder();
@@ -17,12 +19,28 @@ function App() {
 const scanFolder =
   async () => {
 
-    const results =await scanFiles(files,window.electronAPI.runOCR,classifyDocument
-      );
-
-    setScannedFiles(
-      results
+    const results =
+    await scanFiles(
+      files,
+      window.electronAPI.runOCR,
+      classifyDocument
     );
+
+  for (
+    const document
+    of results
+  ) {
+
+    await window
+      .electronAPI
+      .saveDocument(
+        document
+      );
+  }
+
+  setScannedFiles(
+    results
+  );
 };
 
 function getCategory(extension) {
@@ -36,6 +54,40 @@ function getCategory(extension) {
 
   return "Other";
 }
+
+const loadDocuments =
+  async () => {
+
+    const docs =
+      await window
+        .electronAPI
+        .getDocuments();
+
+    console.log(
+      "DOCUMENTS:"
+    );
+
+    console.log(
+      docs
+    );
+};
+
+const search =
+  async () => {
+
+    const docs =
+      await window
+        .electronAPI
+        .searchDocuments(
+          query
+        );
+
+    console.log(docs);
+
+    setResults(
+      docs
+    );
+};
 
 const testOCR = async () => {
   try {
@@ -88,9 +140,56 @@ const testOCR = async () => {
       <button onClick={scanFolder}>
         Scan Folder
       </button>
+      <button onClick={loadDocuments}>
+        Load DB
+      </button>
+      <input type="text" value={query} onChange={e =>
+          setQuery(
+            e.target.value
+          )
+        } placeholder="Search..." />
+
+      <button
+        onClick={search}
+      >
+        Search
+      </button>
       <button onClick={testOCR}>
           Test OCR
         </button>
+
+      {
+  results.map(
+    doc => (
+      <div
+        key={
+          doc.filePath
+        }
+      >
+        <h3>
+          {
+            doc.fileName
+          }
+        </h3>
+        <button
+          onClick={() =>
+            window
+              .electronAPI
+              .openFile(
+                doc.filePath
+              )
+          }>
+          Open
+        </button>
+
+        <p>
+          Score:
+          {doc.score}
+        </p>
+      </div>
+    )
+  )
+}
 
       {
         scannedFiles.map(

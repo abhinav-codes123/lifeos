@@ -1,7 +1,10 @@
+import { extractMetadata } from "./extractMetadata.js";
+import { generateTitleTags, generateKeywordTags } from "./tagGenerator";
+
 export async function scanFiles(
   files,
   runOCR,
-  classifyDocument
+  classifyDocument,
 ) {
 
   const results = [];
@@ -46,6 +49,16 @@ export async function scanFiles(
     text = result.text;
   }
 
+  const titleTags =
+    generateTitleTags(
+        text
+    );
+
+    const keywordTags =
+        generateKeywordTags(
+            text
+    );
+
 
   const category =
     classifyDocument(
@@ -53,6 +66,17 @@ export async function scanFiles(
     );
 
     // for console
+    const metadata =
+    extractMetadata(
+        text,
+        category
+    );
+    // console.log(
+    // metadata
+    // );
+    console.log("CATEGORY:", category);
+    console.log("METADATA:", metadata);
+
     console.log("OCR TEXT:");
     console.log(text);
     console.log("-------------");
@@ -63,10 +87,13 @@ export async function scanFiles(
     );
 
   results.push({
-    name: file.name,
-    category,
-    text,
-  });
+    filePath: file.path,
+    fileName: file.name,
+    titleTags,
+    keywordTags,
+    metadata,
+    ocrText: text
+});
 }
 
   return results;

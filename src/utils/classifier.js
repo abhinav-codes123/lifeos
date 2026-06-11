@@ -65,6 +65,20 @@ export function classifyDocument(text) {
   if (lower.includes("permanent account number"))
     scores.Identity += 4;
 
+  // adding more conditions
+
+  if (lower.includes("organisation"))
+  scores.Certificate += 3;
+
+    if (lower.includes("organization"))
+    scores.Certificate += 3;
+
+    if (lower.includes("participant"))
+    scores.Certificate += 2;
+
+    if (lower.includes("summit"))
+    scores.Certificate += 2;
+
   const winner =
     Object.entries(scores)
       .sort((a, b) => b[1] - a[1])[0];

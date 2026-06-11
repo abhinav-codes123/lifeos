@@ -1,13 +1,20 @@
 import { createRequire } from "module";
+import { shell } from "electron";
 const require = createRequire(import.meta.url);
 const pdfParse = require("pdf-parse");
 
+console.log(typeof pdfParse);
 console.log(pdfParse);
 
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import Tesseract from "tesseract.js";
+import {
+  insertDocument,
+  getAllDocuments,
+  searchDocuments
+} from "./database.js";
 
 
 import fs from "fs";
@@ -140,6 +147,67 @@ ipcMain.handle("extract-pdf-text", async (_, pdfPath) => {
     };
   }
 });
+
+ipcMain.handle(
+  "save-document",
+  async (_, document) => {
+
+    try {
+
+      insertDocument(
+        document
+      );
+
+      return {
+        success: true
+      };
+
+    } catch (error) {
+
+      console.error(error);
+
+      return {
+        success: false,
+        error:
+          error.message
+      };
+    }
+  }
+);
+
+ipcMain.handle(
+  "get-documents",
+  async () => {
+
+    return getAllDocuments();
+
+  }
+);
+
+ipcMain.handle(
+  "search-documents",
+  async (_, query) => {
+
+    return searchDocuments(
+      query
+    );
+
+  }
+);
+
+ipcMain.handle(
+  "open-file",
+  async (_, filePath) => {
+
+    await shell.openPath(
+      filePath
+    );
+
+    return true;
+  }
+);
+
+
 
 // this is for debugging
 app.on("web-contents-created", (_, contents) => {
