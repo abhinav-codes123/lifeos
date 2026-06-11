@@ -9,6 +9,46 @@ const DB_PATH =
     "documents.json"
   );
 
+function generatePreview( text, query) {
+
+  if (!text)
+    return "";
+
+  const lowerText =
+    text.toLowerCase();
+
+  const lowerQuery =
+    query.toLowerCase();
+
+  const index =
+    lowerText.indexOf(
+      lowerQuery
+    );
+
+  if (
+    index === -1
+  ) {
+    return "";
+  }
+
+  const start =
+    Math.max(
+      0,
+      index - 40
+    );
+
+  const end =
+    Math.min(
+      text.length,
+      index + 60
+    );
+
+  return text.slice(
+    start,
+    end
+  );
+}
+
 function ensureDB() {
 
   const dir =
@@ -216,10 +256,24 @@ export function searchDocuments(query) {
         score += 5;
       }
 
-      return {
-        ...doc,
-        score
-      };
+    let preview =
+        generatePreview(
+            doc.text,
+            query
+        );
+
+        if (!preview) {
+
+            preview =
+                doc.titleTags
+                ?.join(" | ");
+        }
+
+        return {
+            ...doc,
+            score,
+            preview
+    };
     })
     .filter(
       doc =>

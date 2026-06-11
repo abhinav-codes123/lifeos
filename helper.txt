@@ -1,0 +1,7 @@
+if some file is pushed to git, after then you need to ignore it from git, then 
+
+git rm --cached path/to/your/file.json
+git add .gitignore
+git commit -m "Ignore json files"
+
+

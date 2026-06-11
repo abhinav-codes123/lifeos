@@ -171,6 +171,7 @@ const testOCR = async () => {
             doc.fileName
           }
         </h3>
+         <p>{doc.preview}</p>
         <button
           onClick={() =>
             window

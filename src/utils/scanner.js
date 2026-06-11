@@ -92,7 +92,7 @@ export async function scanFiles(
     titleTags,
     keywordTags,
     metadata,
-    ocrText: text,
+    text: text,
     scannedAt:new Date().toISOString()
 });
 }
