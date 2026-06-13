@@ -81,6 +81,24 @@ ipcMain.handle("select-folder", async () => {
   };
 });
 
+ipcMain.handle(
+  "get-image-data",
+  async (_, imagePath) => {
+
+    const buffer =
+      fs.readFileSync(
+        imagePath
+      );
+
+    const ext =
+      path
+        .extname(imagePath)
+        .replace(".", "");
+
+    return `data:image/${ext};base64,${buffer.toString("base64")}`;
+  }
+);
+
 ipcMain.handle("select-image", async () => {
   const result = await dialog.showOpenDialog({
     properties: ["openFile"],
@@ -204,6 +222,25 @@ ipcMain.handle(
     );
 
     return true;
+  }
+);
+
+ipcMain.handle(
+  "select-files",
+  async () => {
+
+    const result =
+      await dialog.showOpenDialog({
+        properties: [
+          "openFile",
+          "multiSelections"
+        ],
+      });
+
+    if (result.canceled)
+      return [];
+
+    return result.filePaths;
   }
 );
 

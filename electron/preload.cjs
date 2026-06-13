@@ -10,6 +10,18 @@ contextBridge.exposeInMainWorld(
         "select-folder"
       ),
 
+    getImageData:
+    (imagePath) =>
+      ipcRenderer.invoke(
+        "get-image-data",
+        imagePath
+      ),
+
+    selectFiles: () =>
+      ipcRenderer.invoke(
+        "select-files"
+      ),
+
     selectImage: () =>
       ipcRenderer.invoke(
         "select-image"
