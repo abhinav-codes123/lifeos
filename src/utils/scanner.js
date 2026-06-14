@@ -1,101 +1,253 @@
+// import { extractMetadata } from "./extractMetadata.js";
+// import { generateTitleTags, generateKeywordTags } from "./tagGenerator";
+
+// export async function scanFiles(
+//   files,
+//   runOCR,
+//   classifyDocument,
+//   onProgress
+// ) {
+
+//   const results = [];
+
+//   for (const file of files) {
+
+//   const ext =
+//     file.extension.toLowerCase();
+
+//   let text = "";
+
+//   if (
+//     [".png", ".jpg", ".jpeg"]
+//       .includes(ext)
+//   ) {
+
+//     const result =
+//       await runOCR(
+//         file.path
+//       );
+
+//     if (!result.success)
+//       continue;
+
+//     text = result.text;
+//   }
+
+//   else if (
+//     ext === ".pdf"
+//   ) {
+
+//     const result =
+//       await window
+//         .electronAPI
+//         .extractPDFText(
+//           file.path
+//         );
+
+//     if (!result.success)
+//       continue;
+
+//     text = result.text;
+//   }
+
+//   const titleTags =
+//     generateTitleTags(
+//         text
+//     );
+
+//     const keywordTags =
+//         generateKeywordTags(
+//             text
+//     );
+
+
+//   const category =
+//     classifyDocument(
+//       text
+//     );
+
+//     // for console
+//     const metadata =
+//     extractMetadata(
+//         text,
+//         category
+//     );
+//     // console.log(
+//     // metadata
+//     // );
+//     console.log("CATEGORY:", category);
+//     console.log("METADATA:", metadata);
+
+//     console.log("OCR TEXT:");
+//     console.log(text);
+//     console.log("-------------");
+
+//     console.log(
+//         file.name,
+//         category
+//     );
+
+//   results.push({
+//     filePath: file.path,
+//     fileName: file.name,
+//     titleTags,
+//     keywordTags,
+//     metadata,
+//     text: text,
+//     scannedAt:new Date().toISOString()
+// });
+// }
+
+//   return results;
+// }
+
 import { extractMetadata } from "./extractMetadata.js";
-import { generateTitleTags, generateKeywordTags } from "./tagGenerator";
+import {
+  generateTitleTags,
+  generateKeywordTags
+} from "./tagGenerator";
 
 export async function scanFiles(
   files,
   runOCR,
   classifyDocument,
+  onProgress
 ) {
 
   const results = [];
 
-  for (const file of files) {
-
-  const ext =
-    file.extension.toLowerCase();
-
-  let text = "";
-
-  if (
-    [".png", ".jpg", ".jpeg"]
-      .includes(ext)
+  for (
+    let i = 0;
+    i < files.length;
+    i++
   ) {
 
-    const result =
-      await runOCR(
-        file.path
-      );
+    const file =
+      files[i];
 
-    if (!result.success)
-      continue;
+    const ext =
+      file.extension.toLowerCase();
 
-    text = result.text;
-  }
+    let text = "";
 
-  else if (
-    ext === ".pdf"
-  ) {
+    if (
+      [".png", ".jpg", ".jpeg"]
+        .includes(ext)
+    ) {
 
-    const result =
-      await window
-        .electronAPI
-        .extractPDFText(
+      const result =
+        await runOCR(
           file.path
         );
 
-    if (!result.success)
-      continue;
+      if (!result.success)
+        continue;
 
-    text = result.text;
-  }
+      text = result.text;
+    }
 
-  const titleTags =
-    generateTitleTags(
+    else if (
+      ext === ".pdf"
+    ) {
+
+      const result =
+        await window
+          .electronAPI
+          .extractPDFText(
+            file.path
+          );
+
+      if (!result.success)
+        continue;
+
+      text = result.text;
+    }
+
+    const titleTags =
+      generateTitleTags(
         text
-    );
+      );
 
     const keywordTags =
-        generateKeywordTags(
-            text
+      generateKeywordTags(
+        text
+      );
+
+    const category =
+      classifyDocument(
+        text
+      );
+
+    const metadata =
+      extractMetadata(
+        text,
+        category
+      );
+
+    console.log(
+      "CATEGORY:",
+      category
     );
 
+    console.log(
+      "METADATA:",
+      metadata
+    );
 
-  const category =
-    classifyDocument(
+    console.log(
+      "OCR TEXT:"
+    );
+
+    console.log(
       text
     );
 
-    // for console
-    const metadata =
-    extractMetadata(
-        text,
-        category
+    console.log(
+      "-------------"
     );
-    // console.log(
-    // metadata
-    // );
-    console.log("CATEGORY:", category);
-    console.log("METADATA:", metadata);
-
-    console.log("OCR TEXT:");
-    console.log(text);
-    console.log("-------------");
 
     console.log(
-        file.name,
-        category
+      file.name,
+      category
     );
 
-  results.push({
-    filePath: file.path,
-    fileName: file.name,
-    titleTags,
-    keywordTags,
-    metadata,
-    text: text,
-    scannedAt:new Date().toISOString()
-});
-}
+    results.push({
+
+      filePath:
+        file.path,
+
+      fileName:
+        file.name,
+
+      titleTags,
+
+      keywordTags,
+
+      metadata,
+
+      text,
+
+      scannedAt:
+        new Date()
+          .toISOString()
+
+    });
+
+    // Progress Update
+    if (onProgress) {
+
+      const progress =
+        Math.round(
+          ((i + 1) /
+            files.length) *
+            100
+        );
+
+      onProgress(
+        progress
+      );
+    }
+  }
 
   return results;
 }

@@ -11,6 +11,9 @@
     "electron": "electron electron/main.js"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
     "@tailwindcss/vite": "^4.3.0",
     "better-sqlite3": "^12.10.0",
     "pdf-parse": "^1.1.1",

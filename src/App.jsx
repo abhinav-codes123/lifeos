@@ -15,6 +15,9 @@ function App() {
 
   const handleFolderSelect =
     async () => {
+      setUploadProgress(0);
+      const totalFiles = result.files.length;
+      let processed = 0;
 
   const result =
     await window
@@ -32,7 +35,11 @@ function App() {
     await scanFiles(
       result.files,
       window.electronAPI.runOCR,
-      classifyDocument
+      classifyDocument,
+      progress =>
+        setUploadProgress(
+          progress
+        )
     );
 
   for (
@@ -45,8 +52,17 @@ function App() {
       .saveDocument(
         document
       );
-  }
 
+    processed++;
+    setUploadProgress(
+      Math.round(
+        (processed /
+          totalFiles) *
+          100
+      )
+    );
+  }
+  setUploadProgress(100);
   setScannedFiles(
     results
   );
@@ -249,10 +265,12 @@ async () => {
   const results =
     await scanFiles(
       files,
-      window
-        .electronAPI
-        .runOCR,
-      classifyDocument
+      window.electronAPI.runOCR,
+      classifyDocument,
+      progress =>
+        setUploadProgress(
+          progress
+        )
     );
 
   for (
