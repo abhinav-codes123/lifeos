@@ -240,7 +240,24 @@ ipcMain.handle(
     if (result.canceled)
       return [];
 
-    return result.filePaths;
+    return result.filePaths.map(
+      filePath => ({
+
+        path:
+          filePath,
+
+        name:
+          path.basename(
+            filePath
+          ),
+
+        extension:
+          path.extname(
+            filePath
+          )
+
+      })
+    );
   }
 );
 
