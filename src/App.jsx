@@ -16,7 +16,6 @@ function App() {
   const handleFolderSelect =
     async () => {
       setUploadProgress(0);
-      const totalFiles = result.files.length;
       let processed = 0;
 
   const result =
@@ -30,6 +29,7 @@ function App() {
   setFiles(
     result.files
   );
+  const totalFiles = result.files.length;
 
   const results =
     await scanFiles(
