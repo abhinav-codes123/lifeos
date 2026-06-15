@@ -1,11 +1,24 @@
+import { app } from "electron";
 import fs from "fs";
 import path from "path";
 
+const DATA_DIR =
+  app.isPackaged
+    ? path.join(
+        app.getPath(
+          "userData"
+        ),
+        "data"
+      )
+    : path.join(
+        process.cwd(),
+        "electron",
+        "data"
+      );
+
 const DB_PATH =
   path.join(
-    process.cwd(),
-    "electron",
-    "data",
+    DATA_DIR,
     "documents.json"
   );
 

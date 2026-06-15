@@ -48,8 +48,40 @@ console.log(
     }
   });
 
-  win.loadURL("http://localhost:5173");
+  if (!app.isPackaged) {
+
+  win.loadURL(
+    "http://localhost:5173"
+  );
+
   win.webContents.openDevTools();
+
+} else {
+
+  const indexPath =
+    path.join(
+      __dirname,
+      "../dist/index.html"
+    );
+
+  console.log(
+    "INDEX PATH:",
+    indexPath
+  );
+
+  console.log(
+    "EXISTS:",
+    fs.existsSync(
+      indexPath
+    )
+  );
+
+  win.webContents.openDevTools();
+
+  win.loadFile(
+    indexPath
+  );
+}
 }
 
 ipcMain.handle("select-folder", async () => {
