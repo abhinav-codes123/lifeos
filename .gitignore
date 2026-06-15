@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 electron/data/documents.json
-release
+release/
