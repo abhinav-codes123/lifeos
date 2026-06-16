@@ -294,8 +294,13 @@ async () => {
   <div className="app">
 
     <h1 className="title">
-      LifeOS
+      Smart Search
     </h1>
+
+    <p className="subtitle">
+  Search anything inside PDFs,
+  Images and Documents instantly.
+</p>
 
     <div className="section">
 
@@ -337,7 +342,9 @@ async () => {
           marginTop: "20px"
         }}
       >
-        <h3>
+        <h3 style={{
+          color:"aliceblue"
+        }}>
           Recent Uploads
         </h3>
 
