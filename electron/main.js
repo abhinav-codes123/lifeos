@@ -54,7 +54,7 @@ console.log(
     "http://localhost:5173"
   );
 
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
 
 } else {
 
@@ -76,7 +76,7 @@ console.log(
     )
   );
 
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
 
   win.loadFile(
     indexPath
