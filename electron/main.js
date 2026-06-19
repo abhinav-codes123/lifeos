@@ -20,6 +20,7 @@ import {
 import fs from "fs";
 import { getEmbedding } from "./ai/embedding.js";
 import { cosineSimilarity } from "./ai/similarity.js";
+import { pdfToImage } from "./pdfOCR.js";
 
 // const a =
 //   await getEmbedding(
@@ -140,8 +141,7 @@ ipcMain.handle("select-folder", async () => {
   };
 });
 
-ipcMain.handle(
-  "generate-embedding",
+ipcMain.handle( "generate-embedding",
   async (_, text) => {
 
     try {
@@ -171,8 +171,7 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(
-  "get-image-data",
+ipcMain.handle( "get-image-data",
   async (_, imagePath) => {
 
     const buffer =
@@ -215,9 +214,7 @@ ipcMain.handle("run-ocr", async (_, imagePath) => {
   try {
     console.log("OCR STARTED:", imagePath);
 
-    const {
-      data: { text },
-    } = await Tesseract.recognize(
+    const { data: { text },} = await Tesseract.recognize(
       imagePath,
       "eng"
     );
@@ -236,28 +233,87 @@ ipcMain.handle("run-ocr", async (_, imagePath) => {
   }
 });
 
-ipcMain.handle("extract-pdf-text", async (_, pdfPath) => {
-  try {
-    const buffer = fs.readFileSync(pdfPath);
+ipcMain.handle( "extract-pdf-text",
+  async (_, pdfPath) => {
 
-    const data = await pdfParse(buffer);
+    try {
 
-    return {
-      success: true,
-      text: data.text,
-    };
-  } catch (error) {
-    console.error(error);
+      const buffer =
+        fs.readFileSync(
+          pdfPath
+        );
 
-    return {
-      success: false,
-      error: error.message,
-    };
+      const data =
+        await pdfParse(
+          buffer
+        );
+
+      if (
+        data.text &&
+        data.text.trim()
+          .length > 30
+      ) {
+
+        console.log(
+          "PDF text layer found"
+        );
+
+        return {
+
+          success: true,
+
+          text:
+            data.text
+
+        };
+      }
+
+      console.log(
+        "No text layer found. OCR fallback..."
+      );
+
+      const imagePath =
+        await pdfToImage(
+          pdfPath
+        );
+
+      const {
+        data: {
+          text
+        }
+      } =
+        await Tesseract.recognize(
+          imagePath,
+          "eng"
+        );
+
+      return {
+
+        success: true,
+
+        text
+
+      };
+
+    } catch (error) {
+
+      console.error(
+        error
+      );
+
+      return {
+
+        success: false,
+
+        error:
+          error.message
+
+      };
+    }
   }
-});
+);
 
-ipcMain.handle(
-  "save-document",
+ipcMain.handle( "save-document",
   async (_, document) => {
 
     try {
@@ -283,8 +339,7 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(
-  "get-documents",
+ipcMain.handle( "get-documents",
   async () => {
 
     return getAllDocuments();
@@ -292,8 +347,7 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(
-  "search-documents",
+ipcMain.handle( "search-documents",
   async (_, query) => {
 
     return await searchDocuments(
@@ -303,8 +357,7 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(
-  "open-file",
+ipcMain.handle( "open-file",
   async (_, filePath) => {
 
     await shell.openPath(
@@ -315,8 +368,7 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(
-  "select-files",
+ipcMain.handle( "select-files",
   async () => {
 
     const result =

@@ -313,7 +313,7 @@ async () => {
   return (
   <div className="app">
     <h1 className="title">
-      Smart Search
+      Smart Search 2
     </h1>
 
     <p className="subtitle">
