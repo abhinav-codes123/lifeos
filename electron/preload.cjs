@@ -5,6 +5,12 @@ console.log("PRELOAD LOADED");
 contextBridge.exposeInMainWorld(
   "electronAPI",
   {
+    generateEmbedding:
+    (text) =>
+      ipcRenderer.invoke(
+        "generate-embedding",
+        text
+      ),
     selectFolder: () =>
       ipcRenderer.invoke(
         "select-folder"

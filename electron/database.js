@@ -1,6 +1,8 @@
 import { app } from "electron";
 import fs from "fs";
 import path from "path";
+import { getEmbedding } from "./ai/embedding.js";
+import { cosineSimilarity } from "./ai/similarity.js";
 
 const DATA_DIR =
   app.isPackaged
@@ -203,7 +205,10 @@ export function getAllDocuments() {
   }
 }
 
-export function searchDocuments(query) {
+export async function searchDocuments(query) {
+
+  const originalQuery =
+    query;
 
   query =
     query.toLowerCase();
@@ -211,10 +216,30 @@ export function searchDocuments(query) {
   const docs =
     getAllDocuments();
 
+  const queryEmbedding =
+    await getEmbedding(
+      originalQuery
+    );
+
   return docs
+
     .map(doc => {
 
       let score = 0;
+
+      let semanticScore = 0;
+
+      if (
+        doc.embedding &&
+        doc.embedding.length
+      ) {
+
+        semanticScore =
+          cosineSimilarity(
+            queryEmbedding,
+            doc.embedding
+          );
+      }
 
       // file name
       if (
@@ -260,38 +285,50 @@ export function searchDocuments(query) {
         score += 30;
       }
 
-      // OCR fallback
+      // text
       if (
-        doc.ocrText
+        doc.text
           ?.toLowerCase()
           .includes(query)
       ) {
         score += 5;
       }
 
-    let preview =
+      score += semanticScore * 100;
+
+      console.log( doc.fileName, semanticScore);
+
+      let preview =
         generatePreview(
-            doc.text,
-            query
+          doc.text,
+          query
         );
 
-        if (!preview) {
+      if (!preview) {
 
-            preview =
-                doc.titleTags
-                ?.join(" | ");
-        }
+        preview =
+          doc.titleTags
+            ?.join(" | ");
+      }
 
-        return {
-            ...doc,
-            score,
-            preview
-    };
+      return {
+
+        ...doc,
+
+        score,
+
+        semanticScore,
+
+        preview
+
+      };
     })
+
     .filter(
       doc =>
         doc.score > 0
     )
+
     .sort(
       (a, b) =>
         b.score - a.score

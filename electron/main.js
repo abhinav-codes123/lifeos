@@ -18,6 +18,33 @@ import {
 
 
 import fs from "fs";
+import { getEmbedding } from "./ai/embedding.js";
+import { cosineSimilarity } from "./ai/similarity.js";
+
+// const a =
+//   await getEmbedding(
+//     "machine learning internship"
+//   );
+
+// const b =
+//   await getEmbedding(
+//     "AI internship resume"
+//   );
+
+// const c =
+//   await getEmbedding(
+//     "pizza recipe"
+//   );
+
+// console.log(
+//   "A vs B:",
+//   cosineSimilarity(a,b)
+// );
+
+// console.log(
+//   "A vs C:",
+//   cosineSimilarity(a,c)
+// );
 
  const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -112,6 +139,37 @@ ipcMain.handle("select-folder", async () => {
     files
   };
 });
+
+ipcMain.handle(
+  "generate-embedding",
+  async (_, text) => {
+
+    try {
+
+      const embedding =
+        await getEmbedding(
+          text
+        );
+
+      return {
+        success: true,
+        embedding
+      };
+
+    } catch (error) {
+
+      console.error(
+        error
+      );
+
+      return {
+        success: false,
+        error:
+          error.message
+      };
+    }
+  }
+);
 
 ipcMain.handle(
   "get-image-data",
@@ -238,7 +296,7 @@ ipcMain.handle(
   "search-documents",
   async (_, query) => {
 
-    return searchDocuments(
+    return await searchDocuments(
       query
     );
 
@@ -304,4 +362,27 @@ app.on("web-contents-created", (_, contents) => {
   });
 });
 
-app.whenReady().then(createWindow);
+// app.whenReady().then(createWindow);
+app.whenReady().then(
+  async () => {
+
+    const embedding =
+      await getEmbedding(
+        "machine learning internship"
+      );
+
+    console.log(
+      "Embedding length:",
+      embedding.length
+    );
+
+    console.log(
+      embedding.slice(
+        0,
+        10
+      )
+    );
+
+    createWindow();
+  }
+);

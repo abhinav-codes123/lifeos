@@ -1,8 +1,5 @@
 import { extractMetadata } from "./extractMetadata.js";
-import {
-  generateTitleTags,
-  generateKeywordTags
-} from "./tagGenerator";
+import { generateTitleTags, generateKeywordTags } from "./tagGenerator";
 
 export async function scanFiles(
   files,
@@ -89,6 +86,18 @@ console.log(
         category
       );
 
+    const embeddingResult =
+      await window
+        .electronAPI
+        .generateEmbedding(
+          text
+        );
+
+    const embedding =
+      embeddingResult.success
+        ? embeddingResult.embedding
+        : [];
+
     console.log(
       "CATEGORY:",
       category
@@ -131,6 +140,8 @@ console.log(
       metadata,
 
       text,
+
+      embedding,
 
       scannedAt:
         new Date()

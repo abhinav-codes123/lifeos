@@ -2,6 +2,9 @@ import { pipeline }
 from "@xenova/transformers";
 
 let extractor = null;
+console.log(
+  "EMBEDDING FILE LOADED"
+);
 
 export async function
 getEmbedding(text) {

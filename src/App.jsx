@@ -12,6 +12,26 @@ function App() {
   const [ processingFiles, setProcessingFiles] = useState([]);
   const [recentSearches, setRecentSearches] = useState([]);
   const [viewMode,setViewMode] = useState("grid");
+  const [currentPage,setCurrentPage] = useState(1);
+
+  // const start = (currentPage - 1) * ITEMS_PER_PAGE;
+  // const end = start + ITEMS_PER_PAGE;
+  const ITEMS_PER_PAGE = 10;
+  const totalPages =
+    Math.ceil(
+      results.length /
+      ITEMS_PER_PAGE
+    );
+
+  const visibleResults =
+    results.slice(
+      (currentPage - 1) *
+        ITEMS_PER_PAGE,
+
+      currentPage *
+        ITEMS_PER_PAGE
+    );
+
 
   const handleFolderSelect =
     async () => {
@@ -187,9 +207,9 @@ const search =
 
     console.log(docs);
 
-    setResults(
-  docs
-);
+    setResults(docs);
+
+    setCurrentPage(1);
 
 if (
   query.trim()
@@ -292,7 +312,6 @@ async () => {
 
   return (
   <div className="app">
-
     <h1 className="title">
       Smart Search
     </h1>
@@ -415,7 +434,47 @@ async () => {
 
       <h2>
         Results
+        ({results.length})
       </h2>
+
+      <div
+  style={{
+    display: "flex",
+    gap: "8px",
+    marginTop: "10px"
+  }}
+>
+
+  {
+    Array.from(
+      {
+        length:
+          totalPages
+      },
+      (_, index) => (
+
+        <button
+          key={index}
+          onClick={() =>
+            setCurrentPage(
+              index + 1
+            )
+          }
+          className={
+            currentPage ===
+            index + 1
+              ? "btn btn-primary"
+              : "btn btn-secondary"
+          }
+        >
+          {index + 1}
+        </button>
+
+      )
+    )
+  }
+
+</div>
 
       <div
         style={{
@@ -465,7 +524,7 @@ async () => {
         <div className="grid-view">
 
           {
-            results.map(
+            visibleResults.map(
               doc => (
 
                 <div
@@ -531,7 +590,7 @@ async () => {
         <div className="list-view">
 
           {
-            results.map(
+            visibleResults.map(
               doc => (
 
                 <div
